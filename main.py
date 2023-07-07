@@ -66,12 +66,49 @@ class Player(GameSprite):
             for wall in walls_touched:
                 self.rect.bottom = min(self.rect.bottom, wall.rect.top)
 
+class Enemy(GameSprite):
+    def __init__(self, x, y, width, height, image, min_cord, max_cord, direction, speed):
+        super().__init__(x, y, width, height, image)
+        self.min_cord = min_cord
+        self.max_cord = max_cord
+        self.speed = speed
+        self.direction = direction
+        
+
+    def update(self):
+        if self.direction == "left" or self.direction == "right":
+            if self.direction == "left":
+                self.rect.x -= self.speed
+            elif self.direction == "right":
+                self.rect.x += self.speed
+            
+            if self.rect.right >= self.max_cord:
+                self.direction = "left"
+            elif self.rect.left <= self.min_cord:
+                self.direction = "right"
+
+        elif self.direction == "up" or self.direction == "down":
+            if self.direction == "up":
+                self.rect.y -= self.speed
+            elif self.direction == "down":
+                self.rect.y += self.speed
+
+            if self.rect.bottom >= self.max_cord:
+                self.direction = "up"
+            elif self.rect.top <= self.min_cord:
+                self.direction = "down"
+
+
 player = Player(290, 0, 25, 20, r"images\play.png", 0, 0)
-enemy = GameSprite(600, 390, 40, 30, r"images\enemys.png")
-enemy2 = GameSprite(125, 90, 60, 70, r"images\enem.png")
-enemy3 = GameSprite(270, 180, 30, 50, r"images\ene.png")
 target = GameSprite(630, 540, 40, 40, r"images\target.png")
-#player, target, enemy
+#player, target
+
+enemys = pygame.sprite.Group()
+enemy = Enemy(600, 390, 40, 30, r"images\enemys.png", 160, 420, "up", 2)
+enemy2 = Enemy(125, 90, 60, 70, r"images\enem.png", 90, 520, "up", 3)
+enemy3 = Enemy (270, 180, 30, 50, r"images\ene.png", 165, 340, "up", 2)
+enemys.add(enemy, enemy2, enemy3)
+#enemy/s
 
 walls = pygame.sprite.Group()
 wall_1 = GameSprite(115, 77, 170, 15, r"images\wall2.jpg")
@@ -174,9 +211,8 @@ while game:
         window.blit(fon, (0, 0))
         player.show()
         player.update()
-        enemy.show()
-        enemy2.show()
-        enemy3.show()
+        enemys.draw(window)
+        enemys.update()
         target.show()
         walls.draw(window)
 
